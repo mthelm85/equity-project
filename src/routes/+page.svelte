@@ -7,18 +7,16 @@
 	import data from '$lib/data/data.json';
 	import * as d3 from 'd3';
 
-	let choices = ['Black Wrkrs', 'Poverty', 'Edu Attain', 'Unemployment'];
+	let choices = ['Black Workers', 'Poverty', 'Educational Attainment', 'Unemployment'];
 	let selected = [];
 	let innerHeight;
 	let layerGroup;
 	let jsonLayer;
-	let info;
-	let filtered;
 
 	const varMap = {
-		'Black Wrkrs': 'p_black',
+		'Black Workers': 'p_black',
 		Poverty: 'p_pov',
-		'Edu Attain': 'mdn_edu',
+		'Educational Attainment': 'mdn_edu',
 		Unemployment: 'p_unemp'
 	};
 
@@ -30,25 +28,6 @@
 	};
 
 	$: selectedVars = selected.map((s) => varMap[s]);
-
-	function filteredData() {
-		let arr = data.map((obj) => {
-			const newObj = {};
-			newObj.state = obj.ST;
-			newObj.puma = obj.PUMA;
-			selectedVars.forEach((key) => {
-				if (obj.hasOwnProperty(key)) {
-					newObj[key] = obj[key];
-					newObj[`${key}_t`] = obj[scaledVarMap[key]];
-				}
-			});
-			return newObj;
-		});
-
-		arr.forEach((obj) => addAverageKey(obj));
-
-		return arr;
-	}
 
 	function resizeMap() {
 		const map = document.getElementById('map-container');
@@ -84,7 +63,8 @@
 	}
 
 	function redrawMap() {
-		addAverageKey(Object.keys(data[1]).filter((x) => selectedVars.includes(x)));
+        const keys = Object.keys(data[1]).filter((x) => selectedVars.includes(x)).map(k => scaledVarMap[k]);
+		addAverageKey(keys);
 		if (layerGroup && jsonLayer) {
 			layerGroup.removeLayer(jsonLayer);
 			jsonLayer = L.geoJSON(pumas, {
@@ -134,7 +114,6 @@
 		resizeMap();
 		const mapContainer = document.getElementById('map-container');
 		const map = L.map(mapContainer).setView([39.8283, -98.5795], 5);
-		info = L.control();
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution:
@@ -169,11 +148,17 @@
 	</Cell>
 	<Cell>
 		<div id="map-container" style="height: {0.9 * innerHeight}px;" />
+        <div class="caption">Source: 2021 American Community Survey 5-Year Public Use Microdata Sample</div>
 	</Cell>
 </LayoutGrid>
 
 <style>
 	@import 'leaflet/dist/leaflet.css';
+    .caption {
+        font-family: 'Roboto Mono';
+        font-size: 14px;
+        font-weight: 100;
+    }
 	.centered {
 		height: 60px;
 		display: flex;
