@@ -5,14 +5,6 @@
 	import data from '$lib/data/data.json';
 	import * as d3 from 'd3';
 
-	let L;
-
-	let choices = ['Black Workers', 'Poverty', 'Educational Attainment', 'Unemployment'];
-	let selected = [];
-	let innerHeight;
-	let layerGroup;
-	let jsonLayer;
-
 	const varMap = {
 		'Black Workers': 'p_black',
 		Poverty: 'p_pov',
@@ -27,15 +19,17 @@
 		p_unemp: 'unemp_t'
 	};
 
+	let L;
+	let choices = ['Black Workers', 'Poverty', 'Educational Attainment', 'Unemployment'];
+	let selected = [];
+	let innerHeight;
+	let layerGroup;
+	let jsonLayer;
+
 	$: selectedVars = selected.map((s) => varMap[s]);
 
-	function resizeMap() {
-		const map = document.getElementById('map-container');
-		map.style.height = `${0.9 * innerHeight}px`;
-	}
-
-	function getColor(val) {
-		return d3.scaleQuantize(d3.extent(data.map((obj) => obj.average)), d3.schemeReds[9])(val);
+	$: if (selectedVars) {
+		redrawMap();
 	}
 
 	function addAverageKey(keys) {
@@ -55,17 +49,16 @@
 		});
 	}
 
-	$: if (selectedVars) {
-		redrawMap();
-	}
-
 	function redrawMap() {
 		const keys = Object.keys(data[1])
 			.filter((x) => selectedVars.includes(x))
 			.map((k) => scaledVarMap[k]);
+
 		addAverageKey(keys);
+
 		if (layerGroup && jsonLayer) {
 			layerGroup.removeLayer(jsonLayer);
+
 			jsonLayer = L.geoJSON(pumas, {
 				style: function (feature) {
 					if (selected.length > 0) {
@@ -76,14 +69,14 @@
 							fillColor: puma.length > 0 ? getColor(puma[0].average) : 'white',
 							weight: 0.5,
 							opacity: 1,
-							color: 'black',
+							color: 'grey',
 							fillOpacity: puma.length > 0 ? 0.7 : 0
 						};
 					} else {
 						return {
 							weight: 0.5,
 							opacity: 1,
-							color: 'black',
+							color: 'grey',
 							fillOpacity: 0
 						};
 					}
@@ -92,7 +85,9 @@
 					const puma = data.filter(
 						(obj) => obj.ST == feature.properties.STATEFIP && obj.PUMA == feature.properties.PUMA
 					);
+
 					let popupText = [`<strong>${feature.properties.Name}</strong>`, '<br />'];
+
 					for (let i = 0; i < selected.length; i++) {
 						if (puma.length > 0) {
 							popupText.push(
@@ -101,17 +96,27 @@
 							popupText.push('<br />');
 						}
 					}
+
 					popupText.length > 0 && layer.bindPopup(popupText.join(''));
 				}
 			});
+
 			layerGroup.addLayer(jsonLayer);
 		}
+	}
+
+	function getColor(val) {
+		return d3.scaleQuantize(d3.extent(data.map((obj) => obj.average)), d3.schemeReds[9])(val);
+	}
+
+	function resizeMap() {
+		const map = document.getElementById('map-container');
+		map.style.height = `${0.9 * innerHeight}px`;
 	}
 
 	onMount(async () => {
 		L = await import('leaflet');
 
-		resizeMap();
 		const mapContainer = document.getElementById('map-container');
 		const map = L.map(mapContainer).setView([39.8283, -98.5795], 5);
 
@@ -156,10 +161,9 @@
 		font-weight: 100;
 	}
 	.centered {
-		/* height: 60px; */
 		display: flex;
 		justify-content: center;
 		align-items: center;
-        margin-bottom: 8px;
+		margin-bottom: 8px;
 	}
 </style>
