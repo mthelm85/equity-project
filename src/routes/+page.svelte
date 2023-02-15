@@ -1,11 +1,13 @@
 <script>
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
 	import { onMount } from 'svelte';
-	import L, { popup } from 'leaflet';
+	// import L from 'leaflet';
 	import SegmentedButton, { Segment, Label } from '@smui/segmented-button';
 	import pumas from '$lib/data/ipums_puma_2010.json';
 	import data from '$lib/data/data.json';
 	import * as d3 from 'd3';
+
+    let L;
 
 	let choices = ['Black Workers', 'Poverty', 'Educational Attainment', 'Unemployment'];
 	let selected = [];
@@ -110,7 +112,9 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
+        L = await import('leaflet');
+
 		resizeMap();
 		const mapContainer = document.getElementById('map-container');
 		const map = L.map(mapContainer).setView([39.8283, -98.5795], 5);
