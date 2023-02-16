@@ -16,7 +16,8 @@
 		'Poverty': 'p_pov',
 		'Educational Attainment': 'mdn_edu',
 		'Unemployment': 'p_unemp',
-		'Disabled Workers': 'p_disabled'
+		'Disabled Workers': 'p_disabled',
+		'Veterans': 'p_vet'
 	};
 
 	const scaledVarMap = {
@@ -25,11 +26,12 @@
 		p_pov: 'pov_t',
 		mdn_edu: 'edu_t',
 		p_unemp: 'unemp_t',
-		p_disabled: 'disabled_t'
+		p_disabled: 'disabled_t',
+		p_vet: 'vet_t'
 	};
 
 	let L;
-	let choices = ['Black Workers', 'Hispanic Workers', 'Poverty', 'Educational Attainment', 'Unemployment', 'Disabled Workers'];
+	let choices = ['Black Workers', 'Hispanic Workers', 'Poverty', 'Educational Attainment', 'Unemployment', 'Disabled Workers', 'Veterans'];
 	let selected = [];
 	let innerHeight;
 	let layerGroup;
@@ -234,6 +236,7 @@
 		</li>
 		<li><strong>Unemployment:</strong> The civilian unemployment rate</li>
 		<li><strong>Disabled Workers:</strong> The percentage of workers that have a disability</li>
+		<li><strong>Veterans:</strong> The percentage of workers that have served in the military</li>
 	</ul>
   </Content>
   <Actions>
