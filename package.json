@@ -14,7 +14,10 @@
 	},
 	"devDependencies": {
 		"@smui/button": "^7.0.0-beta.0",
+		"@smui/dialog": "^7.0.0-beta.0",
+		"@smui/icon-button": "^7.0.0-beta.0",
 		"@smui/segmented-button": "^7.0.0-beta.0",
+		"@smui/textfield": "^7.0.0-beta.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/adapter-vercel": "^2.0.2",
 		"@sveltejs/kit": "^1.5.0",
