@@ -204,7 +204,7 @@
   bind:open
   aria-labelledby="simple-title"
   aria-describedby="simple-content"
-  style="z-index: 999 !important"
+  style="z-index: 9999 !important"
   fullscreen
 >
   <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
