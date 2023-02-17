@@ -261,6 +261,8 @@
 		<ul>
 			<li><strong>Black:</strong> The percentage of workers that are Black</li>
 			<li><strong>Hispanic:</strong> The percentage of workers that are Hispanic</li>
+			<li><strong>Asian:</strong> The percentage of workers that are Asian</li>
+			<li><strong>Native:</strong> The percentage of workers that are either American Indian, Alaska Native, Native Hawaiian, or Pacific Islander</li>
 			<li>
 				<strong>Poverty:</strong> The percentage of workers whose income-to-poverty ratio is less than
 				1
