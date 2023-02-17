@@ -9,12 +9,14 @@
 	import * as d3 from 'd3';
 
 	const varMap = {
-		'Black Workers': 'p_black',
-		'Hispanic Workers': 'p_hisp',
+		'Black': 'p_black',
+		'Hispanic': 'p_hisp',
+		'Asian': 'p_asian',
+		'Native': 'p_native',
 		'Poverty': 'p_pov',
 		'Educational Attainment': 'mdn_edu',
 		'Unemployment': 'p_unemp',
-		'Disabled Workers': 'p_disabled',
+		'Disabled': 'p_disabled',
 		'Veterans': 'p_vet',
 		'Limited English': 'p_lim_eng'
 	};
@@ -27,7 +29,9 @@
 		p_unemp: 'unemp_t',
 		p_disabled: 'disabled_t',
 		p_vet: 'vet_t',
-		p_lim_eng: 'lim_eng_t'
+		p_lim_eng: 'lim_eng_t',
+		p_asian: 'asian_t',
+		p_native: 'native_t'
 	};
 
 	const eduMap = {
@@ -41,16 +45,20 @@
 	};
 
 	let L;
+
 	let choices = [
-		'Black Workers',
-		'Hispanic Workers',
+		'Black',
+		'Hispanic',
+		'Asian',
+		'Native',
 		'Poverty',
 		'Educational Attainment',
 		'Unemployment',
-		'Disabled Workers',
+		'Disabled',
 		'Veterans',
 		'Limited English'
 	];
+
 	let selected = [];
 	let innerHeight;
 	let layerGroup;
@@ -251,8 +259,8 @@
 		<p>A brief explanation of each of the variables is below:</p>
 
 		<ul>
-			<li><strong>Black Workers:</strong> The percentage of workers that are Black</li>
-			<li><strong>Hispanic Workers:</strong> The percentage of workers that are Hispanic</li>
+			<li><strong>Black:</strong> The percentage of workers that are Black</li>
+			<li><strong>Hispanic:</strong> The percentage of workers that are Hispanic</li>
 			<li>
 				<strong>Poverty:</strong> The percentage of workers whose income-to-poverty ratio is less than
 				1
@@ -261,7 +269,7 @@
 				<strong>Educational Attainment:</strong> The median educational attainment for workers
 			</li>
 			<li><strong>Unemployment:</strong> The civilian unemployment rate</li>
-			<li><strong>Disabled Workers:</strong> The percentage of workers that have a disability</li>
+			<li><strong>Disabled:</strong> The percentage of workers that have a disability</li>
 			<li><strong>Veterans:</strong> The percentage of workers that have served in the military</li>
 			<li><strong>Limited English:</strong> The percentage of workers that do not speak English well, or at all</li>
 		</ul>
