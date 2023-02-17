@@ -233,11 +233,6 @@
 </div>
 
 <div id="map-container" style="height: {innerHeight - 100}px; width: 100%;" />
-{#if layerGroup}
-	<div class="caption">
-		Source: 2021 American Community Survey 5-Year Public Use Microdata Sample
-	</div>
-{/if}
 <Dialog
 	bind:open
 	aria-labelledby="simple-title"
@@ -280,11 +275,6 @@
 
 <style>
 	@import 'leaflet/dist/leaflet.css';
-	.caption {
-		font-family: 'Roboto Mono';
-		font-size: 14px;
-		font-weight: 100;
-	}
 	.centered {
 		display: flex;
 		justify-content: center;
