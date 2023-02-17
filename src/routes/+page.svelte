@@ -4,8 +4,6 @@
 	import SegmentedButton, { Segment, Label } from '@smui/segmented-button';
 	import Button, { Label as ButtonLabel } from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
-	import Textfield from '@smui/textfield';
-	import HelperText from '@smui/textfield/helper-text';
 	import pumas from '$lib/data/ipums_puma_2010.json';
 	import data from '$lib/data/data.json';
 	import * as d3 from 'd3';
@@ -17,7 +15,8 @@
 		'Educational Attainment': 'mdn_edu',
 		'Unemployment': 'p_unemp',
 		'Disabled Workers': 'p_disabled',
-		'Veterans': 'p_vet'
+		'Veterans': 'p_vet',
+		'Limited English': 'p_lim_eng'
 	};
 
 	const scaledVarMap = {
@@ -27,25 +26,40 @@
 		mdn_edu: 'edu_t',
 		p_unemp: 'unemp_t',
 		p_disabled: 'disabled_t',
-		p_vet: 'vet_t'
+		p_vet: 'vet_t',
+		p_lim_eng: 'lim_eng_t'
+	};
+
+	const eduMap = {
+		'17': 'Regular high school diploma',
+		'16': 'GED or alternative credential',
+		'18': 'Some college, but less than 1 year',
+		'19': '1 or more years of college credit, no degree',
+		'20': "Associate's degree",
+		'21': "Bachelor's degree",
+		'22': "Master's degree"
 	};
 
 	let L;
-	let choices = ['Black Workers', 'Hispanic Workers', 'Poverty', 'Educational Attainment', 'Unemployment', 'Disabled Workers', 'Veterans'];
+	let choices = [
+		'Black Workers',
+		'Hispanic Workers',
+		'Poverty',
+		'Educational Attainment',
+		'Unemployment',
+		'Disabled Workers',
+		'Veterans',
+		'Limited English'
+	];
 	let selected = [];
 	let innerHeight;
 	let layerGroup;
 	let jsonLayer;
 	let open = false;
 
-	let weightBlack = '';
-	let weightPoverty = '';
-	let weightEduAttnmnt = '';
-	let weightUnemployment = '';
-
 	$: selectedVars = selected.map((s) => varMap[s]);
 
-	$: if (selectedVars) {
+	$: if (selected) {
 		redrawMap();
 	}
 
@@ -73,7 +87,7 @@
 
 		addAverageKey(keys);
 
-		if (layerGroup && jsonLayer) {
+		if (layerGroup) {
 			layerGroup.removeLayer(jsonLayer);
 
 			jsonLayer = L.geoJSON(pumas, {
@@ -92,8 +106,6 @@
 					} else {
 						return {
 							weight: 0.0,
-							opacity: 1,
-							color: 'black',
 							fillOpacity: 0
 						};
 					}
@@ -107,9 +119,15 @@
 
 					for (let i = 0; i < selected.length; i++) {
 						if (puma.length > 0) {
-							popupText.push(
-								`${selected[i]}: <strong> ${puma[0][`${varMap[selected[i]]}`]}</strong>`
-							);
+							const selectedVar = varMap[selected[i]];
+							if (selectedVar == 'mdn_edu') {
+								popupText.push(
+									`Median ${selected[i]}: <strong> ${eduMap[puma[0][`${selectedVar}`]]}</strong>`
+								);
+							} else {
+								popupText.push(`${selected[i]}: <strong> ${puma[0][`${selectedVar}`]}%</strong>`);
+							}
+
 							popupText.push('<br />');
 						}
 					}
@@ -155,6 +173,47 @@
 			}
 		});
 	});
+
+	function convertToCSV(headers) {
+		const csvRows = [];
+		csvRows.push(headers.join(','));
+		for (const row of data) {
+			const values = headers.map((header) => {
+				if (header == 'State') {
+					const puma = pumas.features.find(
+						(obj) =>
+							obj.properties.STATEFIP == row[headers[2]] && obj.properties.PUMA == row[headers[3]]
+					);
+					return puma.properties.State;
+				} else if (header == 'Name') {
+					const puma = pumas.features.find(
+						(obj) =>
+							obj.properties.STATEFIP == row[headers[2]] && obj.properties.PUMA == row[headers[3]]
+					);
+					return puma.properties.Name.replace(/,/g, ' |');
+				} else {
+					return row[header];
+				}
+			});
+			csvRows.push(values.join(','));
+		}
+
+		return csvRows.join('\n');
+	}
+
+	function downloadCSV() {
+		const keys = ['State', 'Name', 'ST', 'PUMA']
+			.concat(Object.keys(data[1]).filter((x) => selectedVars.includes(x)))
+			.concat(['average']);
+		const csvData = convertToCSV(keys);
+		const blob = new Blob([csvData], { type: 'text/csv' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'data.csv';
+		a.click();
+		URL.revokeObjectURL(url);
+	}
 </script>
 
 <svelte:window bind:innerHeight on:resize={resizeMap} />
@@ -162,88 +221,61 @@
 <div class="centered">
 	<SegmentedButton segments={choices} let:segment bind:selected>
 		<Segment {segment}>
-			<Label>{segment}</Label>
+			<Label style="font-size: 12px;">{segment}</Label>
 		</Segment>
 	</SegmentedButton>
 	<IconButton style="margin-left: 8px;" on:click={() => (open = true)}>
 		<Icon class="material-icons">help_outline</Icon>
 	</IconButton>
+	<IconButton on:click={downloadCSV} disabled={selected.length == 0}>
+		<Icon class="material-icons">download</Icon>
+	</IconButton>
 </div>
-
-<!-- <div class="centered">
-	<Textfield
-		variant="outlined"
-		bind:value={weightBlack}
-		type="number"
-		input$step="0.1"
-		style="width: 153.06px; height: 36px;"
-	/>
-	<Textfield
-		variant="outlined"
-		bind:value={weightPoverty}
-		
-		style="width: 94.73px; height: 36px;"
-	/>
-	<Textfield
-		variant="outlined"
-		bind:value={weightEduAttnmnt}
-		
-		style="width: 235.28px; height: 36px;"
-	/>
-	<Textfield
-		variant="outlined"
-		bind:value={weightUnemployment}
-		
-		style="width: 152.64px; height: 36px;"
-	/>
-</div> -->
 
 <div id="map-container" style="height: {innerHeight - 100}px; width: 100%;" />
 {#if layerGroup}
-<div class="caption">Source: 2021 American Community Survey 5-Year Public Use Microdata Sample</div>
+	<div class="caption">
+		Source: 2021 American Community Survey 5-Year Public Use Microdata Sample
+	</div>
 {/if}
 <Dialog
-  bind:open
-  aria-labelledby="simple-title"
-  aria-describedby="simple-content"
-  style="z-index: 9999 !important"
-  fullscreen
+	bind:open
+	aria-labelledby="simple-title"
+	aria-describedby="simple-content"
+	style="z-index: 9999 !important"
+	fullscreen
 >
-  <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-  <Title id="simple-title" style="padding: 24px;">About This App</Title>
-  <Content id="simple-content">
-	<p>
-		This application allows you to explore a variety of workforce characteristics that have been estimated from the
-		2021 American Community Survey 5-Year Public Use Microdata Sample.
-	</p>
-	<p>A brief explanation of each of the variables is below:</p>
+	<Title id="simple-title" style="padding: 24px;">About</Title>
+	<Content id="simple-content">
+		<p>
+			This application allows you to explore a variety of workforce characteristics that have been
+			estimated from the 2021 American Community Survey 5-Year Public Use Microdata Sample. You can
+			select a single variable or a combination of variables. If selecting multiple variables, the
+			color scale is determined by the average of the (normalized) values of each selected variable.
+		</p>
+		<p>A brief explanation of each of the variables is below:</p>
 
-	<ul>
-		<li><strong>Black Workers:</strong> The percentage of workers that are Black</li>
-		<li><strong>Hispanic Workers:</strong> The percentage of workers that are Hispanic</li>
-		<li><strong>Poverty:</strong> The percentage of workers whose income-to-poverty ratio is less than 1</li>
-		<li>
-			<strong>Educational Attainment:</strong> The median educational attainment for workers:
-			<ul>
-				<li><strong>16:</strong> Regular high school diploma</li>
-				<li><strong>17:</strong> GED or alternative credential</li>
-				<li><strong>18:</strong> Some college, but less than 1 year</li>
-				<li><strong>19:</strong> 1 or more years of college credit, no degree</li>
-				<li><strong>20:</strong> Associate's degree</li>
-				<li><strong>21:</strong> Bachelor's degree</li>
-				<li><strong>22:</strong> Master's degree</li>
-			</ul>
-		</li>
-		<li><strong>Unemployment:</strong> The civilian unemployment rate</li>
-		<li><strong>Disabled Workers:</strong> The percentage of workers that have a disability</li>
-		<li><strong>Veterans:</strong> The percentage of workers that have served in the military</li>
-	</ul>
-  </Content>
-  <Actions>
-    <Button>
-      <ButtonLabel>Close</ButtonLabel>
-    </Button>
-  </Actions>
+		<ul>
+			<li><strong>Black Workers:</strong> The percentage of workers that are Black</li>
+			<li><strong>Hispanic Workers:</strong> The percentage of workers that are Hispanic</li>
+			<li>
+				<strong>Poverty:</strong> The percentage of workers whose income-to-poverty ratio is less than
+				1
+			</li>
+			<li>
+				<strong>Educational Attainment:</strong> The median educational attainment for workers
+			</li>
+			<li><strong>Unemployment:</strong> The civilian unemployment rate</li>
+			<li><strong>Disabled Workers:</strong> The percentage of workers that have a disability</li>
+			<li><strong>Veterans:</strong> The percentage of workers that have served in the military</li>
+			<li><strong>Limited English:</strong> The percentage of workers that do not speak English well, or at all</li>
+		</ul>
+	</Content>
+	<Actions>
+		<Button>
+			<ButtonLabel>Close</ButtonLabel>
+		</Button>
+	</Actions>
 </Dialog>
 
 <style>
