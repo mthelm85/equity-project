@@ -9,15 +9,15 @@
 	import * as d3 from 'd3';
 
 	const varMap = {
-		'Black': 'p_black',
-		'Hispanic': 'p_hisp',
-		'Asian': 'p_asian',
-		'Native': 'p_native',
-		'Poverty': 'p_pov',
+		Black: 'p_black',
+		Hispanic: 'p_hisp',
+		Asian: 'p_asian',
+		Native: 'p_native',
+		Poverty: 'p_pov',
 		'Educational Attainment': 'mdn_edu',
-		'Unemployment': 'p_unemp',
-		'Disabled': 'p_disabled',
-		'Veterans': 'p_vet',
+		Unemployment: 'p_unemp',
+		Disabled: 'p_disabled',
+		Veterans: 'p_vet',
 		'Limited English': 'p_lim_eng'
 	};
 
@@ -140,6 +140,7 @@
 						}
 					}
 
+					puma.length > 0 && popupText.push(`Index Value: <strong>${Math.round(puma[0].average * 100)}</strong>`)
 					popupText.length > 0 && layer.bindPopup(popupText.join(''));
 				}
 			});
@@ -262,7 +263,10 @@
 			<li><strong>Black:</strong> The percentage of workers that are Black</li>
 			<li><strong>Hispanic:</strong> The percentage of workers that are Hispanic</li>
 			<li><strong>Asian:</strong> The percentage of workers that are Asian</li>
-			<li><strong>Native:</strong> The percentage of workers that are either American Indian, Alaska Native, Native Hawaiian, or Pacific Islander</li>
+			<li>
+				<strong>Native:</strong> The percentage of workers that are either American Indian, Alaska Native,
+				Native Hawaiian, or Pacific Islander
+			</li>
 			<li>
 				<strong>Poverty:</strong> The percentage of workers whose income-to-poverty ratio is less than
 				1
@@ -273,7 +277,10 @@
 			<li><strong>Unemployment:</strong> The civilian unemployment rate</li>
 			<li><strong>Disabled:</strong> The percentage of workers that have a disability</li>
 			<li><strong>Veterans:</strong> The percentage of workers that have served in the military</li>
-			<li><strong>Limited English:</strong> The percentage of workers that do not speak English well, or at all</li>
+			<li>
+				<strong>Limited English:</strong> The percentage of workers that do not speak English well, or
+				at all
+			</li>
 		</ul>
 	</Content>
 	<Actions>
