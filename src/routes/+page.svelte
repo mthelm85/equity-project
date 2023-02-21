@@ -140,7 +140,8 @@
 						}
 					}
 
-					puma.length > 0 && popupText.push(`Index Value: <strong>${Math.round(puma[0].average * 100)}</strong>`)
+					puma.length > 0 &&
+						popupText.push(`Index Value: <strong>${Math.round(puma[0].average * 100)}</strong>`);
 					popupText.length > 0 && layer.bindPopup(popupText.join(''));
 				}
 			});
@@ -200,6 +201,8 @@
 							obj.properties.STATEFIP == row[headers[2]] && obj.properties.PUMA == row[headers[3]]
 					);
 					return puma.properties.Name.replace(/,/g, ' |');
+				} else if (header == 'Index Value') {
+					return Math.round(row['average'] * 100);
 				} else {
 					return row[header];
 				}
@@ -213,7 +216,8 @@
 	function downloadCSV() {
 		const keys = ['State', 'Name', 'ST', 'PUMA']
 			.concat(Object.keys(data[1]).filter((x) => selectedVars.includes(x)))
-			.concat(['average']);
+			.concat(['Index Value']);
+
 		const csvData = convertToCSV(keys);
 		const blob = new Blob([csvData], { type: 'text/csv' });
 		const url = URL.createObjectURL(blob);
