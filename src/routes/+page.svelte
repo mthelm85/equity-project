@@ -165,9 +165,10 @@
 		const mapContainer = document.getElementById('map-container');
 		const map = L.map(mapContainer).setView([39.8283, -98.5795], 5);
 
+		map.attributionControl.setPrefix('')
+
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			attribution:
-				'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+			attribution: false,
 			maxZoom: 18
 		}).addTo(map);
 
